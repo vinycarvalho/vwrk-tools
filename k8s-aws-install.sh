@@ -116,16 +116,19 @@ systemctl enable --now kubelet
 
 if [[ $is_worker ]]; then
 	echo "kubeadm join $ip_control_arg --token $token_arg --discovery-token-ca-cert-hash $ca_arg"
-	kubeadm join $ $ip_control_arg--token $token_arg --discovery-token-ca-cert-hash $ca_arg
+	kubeadm join $ip_control_arg --token $token_arg --discovery-token-ca-cert-hash $ca_arg
 else
 	# Start control pane
 	echo "kubeadm init --pod-network-cidr=$pod_network --apiserver-advertise-address=$ip_apiserver"
 	kubeadm init --pod-network-cidr=$pod_network --apiserver-advertise-address=$ip_apiserver
+	hash_arg=$(openssl x509 -in /etc/kubernetes/pki/ca.crt -noout -pubkey | openssl rsa -pubin -outform DER 2>/dev/null | sha256sum | cut -d' ' -f1)
+	token_arg=$(kubeadm token list | grep -Eo "^[a-z0-9.]+")
+	echo "curl -fSsl https://raw.githubusercontent.com/vinycarvalho/vwrk-tools/main/k8s-aws-install.sh | bash -s -- -a $ip_apiserver -t $token_arg -c $hash_arg"
+	kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
 
 	# Config kubeadm
 	mkdir -p $HOME/.kube
 	cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 	chown $(id -u):$(id -g) $HOME/.kube/config
 fi
-
 
