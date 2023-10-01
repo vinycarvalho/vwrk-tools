@@ -128,7 +128,7 @@ else
 
 	while true; do
 		lines=$(kubectl get node | wc -l)
-		if [[ $lines -gt 2 ]]
+		if [[ $lines -gt 2 ]]; then
 			kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
 			break
 		else
