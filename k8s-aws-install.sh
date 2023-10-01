@@ -127,8 +127,8 @@ else
 	echo "curl -fSsl https://raw.githubusercontent.com/vinycarvalho/vwrk-tools/main/k8s-aws-install.sh | bash -s -- -a $ip_apiserver:6443 -t $token_arg -c sha256:$hash_arg"
 
 	while true; do
-		lines=$(kubectl get node | wc -l)
-		if [[ $lines -gt 2 ]]; then
+		node_lines=$(kubectl get node | wc -l)
+		if [[ $node_lines -gt 2 ]]; then
 			kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
 			break
 		else
