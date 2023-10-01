@@ -28,11 +28,20 @@ fi
 
 [[ -z token_arg ]] && [[ -z $ca_arg ]] && is_worker=1
 
-# Conferindo o user root
+# Is root?
 userName=$(whoami)
 
 if [[ $userName != "root" ]]; then
 	echo "Need run as root"
+	exit
+fi
+
+# Have memory?
+totalMem=$(free -m | grep -E "^Mem: " | xargs | cut -d" " -f 2)
+
+if [[ $totalMem -lt 1700 ]]; then
+	echo "Need at least 1700MB memory ram"
+	exit
 fi
 
 # turn off swap 
