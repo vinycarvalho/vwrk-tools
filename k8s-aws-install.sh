@@ -6,7 +6,7 @@ while getopts "s:n:t:c:" arg; do
     s)
       ip_arg=$OPTARG
       ;;
-    s)
+    n)
       net_arg=$OPTARG
       ;;
     t)
@@ -20,13 +20,13 @@ done
 
 [[ -z $net_arg ]] && pod_network="10.10.0.0/16" || pod_network=$net_arg
 
-if [[ -z $net_arg ]]; then
+if [[ -z $ip_arg ]]; then
 	ip_apiserver=$(ip r g 8.8.8.8 | sed -rn 's/.* src ([0-9.]+) .*$/\1/p')
 else
 	ip_apiserver=$ip_arg
 fi
 
-[[ -z token_arg ]] && [[ -z $ca_arg ]] && is_worker=1
+[[ -z $token_arg ]] && [[ -z $ca_arg ]] && is_worker=1
 
 # Is root?
 userName=$(whoami)
@@ -94,7 +94,7 @@ chmod a+r /etc/apt/keyrings/docker.gpg
 
 # Add the repository to Apt sources:
 cat << EOF > /etc/apt/sources.list.d/docker.list
-deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable"
+deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable
 EOF
 
 apt -y update 
@@ -112,14 +112,16 @@ systemctl status containerd
 systemctl enable --now kubelet
 
 if [[ $is_worker ]]; then
-	echo "Worker!"
+	echo "kubeadm join $ip_arg --token $token_arg --discovery-token-ca-cert-hash $ca_arg"
+	kubeadm join $ip_apiserver --token $token_arg --discovery-token-ca-cert-hash $ca_arg
 else
 	# Start control pane
 	kubeadm init --pod-network-cidr=$pod_network --apiserver-advertise-address=$ip_apiserver
+
+	# Config kubeadm
+	mkdir -p $HOME/.kube
+	cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+	chown $(id -u):$(id -g) $HOME/.kube/config
 fi
 
-# Config kubeadm
-mkdir -p $HOME/.kube
-cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-chown $(id -u):$(id -g) $HOME/.kube/config
 
