@@ -1,19 +1,22 @@
 #!/bin/bash
 
 # Get options
-while getopts "s:n:t:c:" arg; do
+while getopts "a:c:n:s:t:" arg; do
   case $arg in
-    s)
-      ip_arg=$OPTARG
+    a)
+      ip_control_arg=$OPTARG
+      ;;
+    c)
+      ca_arg=$OPTARG
       ;;
     n)
       net_arg=$OPTARG
       ;;
+    s)
+      ip_arg=$OPTARG
+      ;;
     t)
      token_arg=$OPTARG
-      ;;
-    c)
-      ca_arg=$OPTARG
       ;;
   esac
 done
@@ -26,7 +29,7 @@ else
 	ip_apiserver=$ip_arg
 fi
 
-[[ -z $token_arg ]] && [[ -z $ca_arg ]] && is_worker=1
+[[ -z $token_arg ]] && [[ -z $ca_arg ]] && [[ -z $ip_control_arg ]] && is_worker=1
 
 # Is root?
 userName=$(whoami)
@@ -112,10 +115,11 @@ systemctl status containerd
 systemctl enable --now kubelet
 
 if [[ $is_worker ]]; then
-	echo "kubeadm join $ip_arg --token $token_arg --discovery-token-ca-cert-hash $ca_arg"
-	kubeadm join $ip_apiserver --token $token_arg --discovery-token-ca-cert-hash $ca_arg
+	echo "kubeadm join $ip_control_arg --token $token_arg --discovery-token-ca-cert-hash $ca_arg"
+	kubeadm join $ $ip_control_arg--token $token_arg --discovery-token-ca-cert-hash $ca_arg
 else
 	# Start control pane
+	echo "kubeadm init --pod-network-cidr=$pod_network --apiserver-advertise-address=$ip_apiserver"
 	kubeadm init --pod-network-cidr=$pod_network --apiserver-advertise-address=$ip_apiserver
 
 	# Config kubeadm
