@@ -71,7 +71,7 @@ sysctl --system
 
 # Install kubernetes
 apt -y update 
-apt -y install apt-transport-https curl
+apt -y install apt-transport-https curl bash-completion openssl
 
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
@@ -113,6 +113,11 @@ systemctl restart containerd
 systemctl status containerd
 
 systemctl enable --now kubelet
+
+# Config bash completion
+echo 'alias k=kubectl' >>~/.bashrc
+echo 'complete -o default -F __start_kubectl k' >>~/.bashrc
+source ~/.bashrc
 
 if [[ $is_worker ]]; then
 	echo "kubeadm join $ip_control_arg --token $token_arg --discovery-token-ca-cert-hash $ca_arg"
