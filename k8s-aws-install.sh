@@ -70,22 +70,32 @@ sysctl --system
 apt -y update 
 apt -y install apt-transport-https curl
 
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" >> /etc/apt/sources.list.d/kubernetes.list
+cat << EOF > /etc/apt/sources.list.d/kubernetes.list
+deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /
+EOF
 
 apt -y update
 apt -y install kubelet kubeadm kubectl
 
 apt-mark hold kubelet kubeadm kubectl
 
+[[ -d /etc/apt/keyrings ]] || mkdir -m 755 /etc/apt/keyrings
+
 # Install containerd
 apt -y update
 apt -y install apt-transport-https ca-certificates curl gnupg lsb-release
 
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+# Add Docker's official GPG key:
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+chmod a+r /etc/apt/keyrings/docker.gpg
 
-echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+# Add the repository to Apt sources:
+cat << EOF > /etc/apt/sources.list.d/docker.list
+deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable"
+EOF
 
 apt -y update 
 apt -y install containerd.io
