@@ -121,13 +121,21 @@ else
 	# Start control pane
 	echo "kubeadm init --pod-network-cidr=$pod_network --apiserver-advertise-address=$ip_apiserver"
 	kubeadm init --pod-network-cidr=$pod_network --apiserver-advertise-address=$ip_apiserver
+
+	# Config kubeadm
+	mkdir -p $HOME/.kube
+	cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+	chown $(id -u):$(id -g) $HOME/.kube/config
+
+	# Mount command to worker joint
 	hash_arg=$(openssl x509 -in /etc/kubernetes/pki/ca.crt -noout -pubkey | openssl rsa -pubin -outform DER 2>/dev/null | sha256sum | cut -d' ' -f1)
 	token_arg=$(kubeadm token list | grep -Eo "^[a-z0-9.]+")
 	echo "### Start your worker ###"
 	echo "curl -fSsl https://raw.githubusercontent.com/vinycarvalho/vwrk-tools/main/k8s-aws-install.sh | bash -s -- -a $ip_apiserver:6443 -t $token_arg -c sha256:$hash_arg"
+	echo "#########################"
 
 	while true; do
-		node_lines=$(kubectl get node | wc -l)
+		node_lines=$(kubectl get node 2>&- | wc -l)
 		if [[ $node_lines -gt 2 ]]; then
 			kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
 			break
@@ -136,9 +144,5 @@ else
 		fi
 	done
 
-	# Config kubeadm
-	mkdir -p $HOME/.kube
-	cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-	chown $(id -u):$(id -g) $HOME/.kube/config
 fi
 
