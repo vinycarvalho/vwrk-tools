@@ -29,7 +29,7 @@ else
 	ip_apiserver=$ip_arg
 fi
 
-[[ -z $token_arg ]] && [[ -z $ca_arg ]] && [[ -z $ip_control_arg ]] && is_worker=1
+[[ -n $token_arg ]] && [[ -n $ca_arg ]] && [[ -n $ip_control_arg ]] && is_worker=1
 
 # Is root?
 userName=$(whoami)
