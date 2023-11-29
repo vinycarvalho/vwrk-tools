@@ -1,6 +1,6 @@
 #!/bin/bash
 
-keytool_cmd=keytool
+keytool_cmd=/usr/java/jdk1.6.0_18/bin/keytool
 openssl_cmd=openssl
 cert_path=/etc/pki/tls/certs/ptu
 jks_keystore="/cloud/totvs/foundation/jboss-4.2.3.GA/server/ptu/conf/cert.javaks"
@@ -17,6 +17,7 @@ echo "
 "
 
 read -sp "Keystore password: " jks_pass
+echo
 echo
 
 if ! (which $keytool_cmd > /dev/null); then
@@ -40,12 +41,13 @@ while read line; do
 	if grep -Eq "^Alias name:" <<< $line; then
 		let cert_num++
 		cert_alias[$cert_num]=$(sed  "s/^Alias name: //g" <<< $line)
-		echo -e "Certificate [$cert_num]\n"
+		echo "Certificate [$cert_num]"
+		echo "$line"
 	else
-		echo "$line\n"
+		echo -e "$line\n"
 	fi
 	
-done <<< $($keytool_cmd -v -keystore $jks_keystore -storepass "$jks_pass" -list 2>&- | grep -E "^(Owner|Alias name):")
+done <<< "$($keytool_cmd -v -keystore $jks_keystore -storepass "$jks_pass" -list 2>&- | grep -E "^(Owner|Alias name):")"
 
 read -p "Select certificate [1-${#cert_alias[@]}]: " cert_choiced
 
