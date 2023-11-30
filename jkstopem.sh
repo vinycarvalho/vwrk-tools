@@ -1,24 +1,51 @@
 #!/bin/bash
 
-keytool_cmd=/usr/java/jdk1.6.0_18/bin/keytool
+keytool_cmd=keytool
 openssl_cmd=openssl
-cert_path=/etc/pki/tls/certs/ptu
-jks_keystore="/cloud/totvs/foundation/jboss-4.2.3.GA/server/ptu/conf/cert.javaks"
 
-echo "
-   _____      _                  _____          _
-  / ____|    | |                / ____|        | |
- | (___   ___| |_ _   _ _ __   | |     ___ _ __| |_
-  \___ \ / _ \ __| | | | '_ \  | |    / _ \ '__| __|
-  ____) |  __/ |_| |_| | |_) | | |___|  __/ |  | |_
- |_____/ \___|\__|\__,_| .__/   \_____\___|_|   \__|
-                       | |
-                       |_|
-"
+if ! options=$(getopt -o c:k:p: -l cert:,keystore:,pass: -- "$@"); then
+	exit 1
+fi
 
-read -sp "Keystore password: " jks_pass
-echo
-echo
+set -- $options
+
+while [ $# -gt 0 ]; do
+	case $1 in
+		-c|--cert) 
+			cert_path="$2";
+			shift
+			;;
+		-k|--keystore) 
+			jks_keystore="$2";
+			shift
+			;;
+		-p|--pass)
+			jks_pass="$2"
+			shift
+			;;
+		--keytool)
+			keytool_cmd="$2"
+			shift
+			;;
+		--openssl)
+			openssl_cmd="$2"
+			shift
+			;;
+		(--)
+			shift;
+			break
+			;;
+		(-*)
+			echo "$0: error - unrecognized option $1" 1>&2;
+			exit 1
+			;;
+		(*)
+			break
+			;;
+	esac
+
+	shift
+done
 
 if ! (which $keytool_cmd > /dev/null); then
 	echo "Command $keytool_cmd not found"
