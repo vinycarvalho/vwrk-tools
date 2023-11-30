@@ -3,7 +3,7 @@
 keytool_cmd=keytool
 openssl_cmd=openssl
 
-if ! options=$(getopt -o c:k:p: -l cert:,keystore:,pass:,keytool,openssl -- "$@"); then
+if ! options=$(getopt -o c:k:p: -l cert:,keystore:,pass:,keytool:,openssl: -- "$@"); then
 	exit 1
 fi
 
