@@ -12,15 +12,15 @@ set -- $options
 while [ $# -gt 0 ]; do
 	case $1 in
 		-c|--cert) 
-			cert_path="$2";
+			cert_path=$(sed "s/'//g" <<< $2)
 			shift
 			;;
 		-k|--keystore) 
-			jks_keystore="$2";
+			jks_keystore=$(sed "s/'//g" <<< $2)
 			shift
 			;;
 		-p|--pass)
-			jks_pass="$2"
+			jks_pass=$(sed "s/'//g" <<< $2)
 			shift
 			;;
 		--keytool)
