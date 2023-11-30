@@ -24,11 +24,11 @@ while [ $# -gt 0 ]; do
 			shift
 			;;
 		--keytool)
-			keytool_cmd="$2"
+			keytool_cmd=$(sed "s/'//g" <<< $2)
 			shift
 			;;
 		--openssl)
-			openssl_cmd="$2"
+			openssl_cmd=$(sed "s/'//g" <<< $2)
 			shift
 			;;
 		(--)
