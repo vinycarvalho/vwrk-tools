@@ -1,4 +1,5 @@
 #!/bin/bash
+# Write by Vinicius Costa Carvalho - vinicius.ccarvalho@totvs.com.br - https://www.linkedin.com/in/viny-carvalho
 
 keytool_cmd=keytool
 openssl_cmd=openssl
