@@ -76,7 +76,7 @@ while read line; do
 	
 done <<< "$($keytool_cmd -v -keystore $jks_keystore -storepass "$jks_pass" -list 2>&- | grep -E "^(Owner|Alias name):")"
 
-read -p "Select certificate [1-${#cert_alias[@]}]: " cert_choiced
+read -p "Select certificate [1-${#cert_alias[@]}]: " cert_choiced < /dev/tty
 
 echo ${cert_alias[$cert_choiced]}
 
