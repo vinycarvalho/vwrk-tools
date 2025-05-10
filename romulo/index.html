@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saldo Nubank</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #8A05BE;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .saldo-box {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .button {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            background-color: white;
+            color: #8A05BE;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #f0e0ff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo">Nubank</div>
+        <p>Olá, Kota 👋</p>
+        <div class="saldo-box" id="saldo">••••••••</div>
+        <button class="button" onclick="toggleSaldo()">Mostrar saldo</button>
+    </div>
+
+    <script>
+        let saldoVisivel = false;
+        function toggleSaldo() {
+            const saldoElemento = document.getElementById("saldo");
+            const botao = document.querySelector(".button");
+
+            if (saldoVisivel) {
+                saldoElemento.textContent = "••••••••";
+                botao.textContent = "Mostrar saldo";
+            } else {
+                saldoElemento.textContent = "R$ 9.999.999.999.999.320,75";
+                botao.textContent = "Ocultar saldo";
+            }
+            saldoVisivel = !saldoVisivel;
+        }
+    </script>
+
+</body>
+</html>
+
